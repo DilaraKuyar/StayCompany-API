@@ -108,9 +108,18 @@ http://localhost:3000
 
 
 ## Database
-Database: MySQL
-Persistent storage ensures data integrity
-Configure credentials in: 
+- Database: MySQL
+- Persistent storage ensures data integrity
+- Configure credentials in: 
 src/config/db.js
 
 ## Deployment(AWS EC2)
+- The API is deployed on an AWS EC2 instance. 
+
+### 1.Server Setup
+-sudo apt update
+-sudo apt install nodejs npm -y
+
+-git clone https://github.com/DilaraKuyar/StayCompany-API.git
+-cd StayCompany-API
+-npm install
