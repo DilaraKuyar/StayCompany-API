@@ -58,8 +58,7 @@ The API was tested using **k6** across three scenarios (Normal, Peak, and Stress
 ├── server.js             # Main entry point
 ├── package.json          # Dependencies & Scripts
 └── README.md             # Project documentation
-
-
+```
 ## Getting Started
 
 ### Prerequisites
@@ -91,5 +90,5 @@ npm run dev
 
 ###Production Mode
 npm start
-**Server will run on** 
-http://localhost:3000
+**Server will run on**
+http://localhost:3000 
