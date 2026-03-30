@@ -24,13 +24,13 @@ A robust, service-oriented RESTful API built with **Node.js**, **Express**, and 
 ## 📊 Data Model (ER Diagram)
 The system architecture follows a relational model to ensure data integrity and scalability.
 
-![ER Diagram](db_ER_diagrqam.png)
+![ER Diagram](db_ER_diagram.png)
 
 *Design includes: Users, Listings, Categories, Bookings, and Reviews with primary and foreign key relationships.*
 
 ---
 
-## 📈 Load Testing Results (k6)
+## Load Testing Results (k6)
 The API was tested using **k6** across three scenarios (Normal, Peak, and Stress) for 30 seconds each.
 
 | Scenario | Virtual Users (VUs) | Avg Response Time | p95 Latency | Req/Sec | Error Rate |
@@ -46,7 +46,7 @@ The API was tested using **k6** across three scenarios (Normal, Peak, and Stress
 
 ---
 
-## 🏗 Project Structure
+## Project Structure
 ```text
 .
 ├── src/
@@ -58,3 +58,38 @@ The API was tested using **k6** across three scenarios (Normal, Peak, and Stress
 ├── server.js             # Main entry point
 ├── package.json          # Dependencies & Scripts
 └── README.md             # Project documentation
+
+
+## Getting Started
+
+### Prerequisites
+
+Before running this project, make sure you have:
+
+- Node.js 18+
+- npm or yarn
+- MySQL Server (local or AWS RDS)
+
+Check your environment:
+
+```bash
+node -v
+npm -v
+
+## 1.Clone the Repository
+
+git clone https://github.com/DilaraKuyar/StayCompany-API.git
+cd StayCompany-API
+
+## 2. Install Dependencies
+
+npm install
+
+## Running the Server
+### Development Mode
+npm run dev
+
+###Production Mode
+npm start
+**Server will run on** 
+http://localhost:3000
