@@ -1,7 +1,7 @@
 const jwt = require('jsonwebtoken');
 
 const authMiddleware = (req, res, next) => {
-    // 1. Gelen isteğin başlığında (header) bilet var mı bak
+    
     const token = req.header('Authorization');
     
     if (!token) {
@@ -9,14 +9,14 @@ const authMiddleware = (req, res, next) => {
     }
 
     try {
-        // 2. Bilet sahte mi diye kontrol et ("Bearer " kısmını atarak)
+        
         const tokenWords = token.split(" ");
         const finalToken = tokenWords[1] ? tokenWords[1] : tokenWords[0];
         
-        const verified = jwt.verify(finalToken, "mysecret_key_1234"); // Gerçek projelerde bu .env içinde saklanır
+        const verified = jwt.verify(finalToken, "mysecret_key_1234"); 
         req.user = verified;
         
-        // 3. Her şey yolundaysa içeri geçmesine izin ver
+        
         next();
     } catch (error) {
         return res.status(400).json({ status: "Error", message: "Invalid Token!" });

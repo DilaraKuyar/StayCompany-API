@@ -23,7 +23,6 @@ class ListingService {
         return result;
     }
 
-    // 4. Rezervasyon Yapma (Çakışma Kontrollü)
     async bookAStay(bookingData) {
         const { listing_id, guest_id, from_date, to_date } = bookingData;
 
@@ -46,9 +45,8 @@ class ListingService {
         return result;
     }
 
-    // 5. İlanları Arama ve SAYFALAMA (PAGING) - Temizlenmiş ve Birleştirilmiş Hal
     async queryListings(params) {
-        // Parametreleri al, eğer gönderilmemişse varsayılan değerleri (1. sayfa, 10 kayıt) kullan
+       
         const { country, city, no_of_people = 1, page = 1, limit = 10 } = params;
         
         const limitNumber = parseInt(limit);

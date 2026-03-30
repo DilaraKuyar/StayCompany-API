@@ -1,9 +1,9 @@
-const rateLimitMap = new Map(); // Kim ne kadar arama yaptı burada tutacağız
+const rateLimitMap = new Map(); 
 
 const searchLimiter = (req, res, next) => {
-    const ip = req.ip; // Arama yapanın IP adresi
-    const today = new Date().toDateString(); // Bugünün tarihi (Örn: "Sun Mar 29 2026")
-    const key = `${ip}_${today}`; // IP + Tarih birleşimi (Örn: "127.0.0.1_Sun Mar 29 2026")
+    const ip = req.ip; 
+    const today = new Date().toDateString(); 
+    const key = `${ip}_${today}`; 
 
     const currentUsage = rateLimitMap.get(key) || 0;
 
@@ -14,7 +14,6 @@ const searchLimiter = (req, res, next) => {
         });
     }
 
-    // Limiti bir artır ve devam etmesine izin ver
     rateLimitMap.set(key, currentUsage + 1);
     console.log(`IP: ${ip} | Daily search count: ${currentUsage + 1}`);
     next();

@@ -48,11 +48,9 @@ const authController = {
      *         description: Sunucu hatası
      */
     login: async (req, res) => {
-        // Normalde burada kullanıcının email ve şifresi DB'den kontrol edilir.
-        // Biz direkt token üretiyoruz ki hoca test edebilsin.
         
         const fakeUserId = 1; 
-        const token = jwt.sign({ id: fakeUserId }, "benim_gizli_anahtarim_123", { expiresIn: '1h' });
+        const token = jwt.sign({ id: fakeUserId }, "bmysecret_key_1234", { expiresIn: '1h' });
 
         return res.status(200).json({
             status: "Successful",
