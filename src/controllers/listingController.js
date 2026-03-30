@@ -5,8 +5,8 @@ const listingController = {
      * @swagger
      * /api/v1/listings:
      *   post:
-     *     summary: Yeni bir ev/ilan ekler (Host tarafı)
-     *     description: Ev sahibinin sisteme yeni bir kiralık ev eklemesini sağlar.
+     *     summary: Adds a new property/listing (Host side
+     *     description: Allows the host to add a new rental property to the system.
      *     security:
      *       - bearerAuth: []
      *     requestBody:
@@ -39,7 +39,7 @@ const listingController = {
      *               - price
      *     responses:
      *       201:
-     *         description: İlan başarıyla oluşturuldu
+     *         description: Listing created successfully
      *         content:
      *           application/json:
      *             schema:
@@ -52,11 +52,11 @@ const listingController = {
      *                   type: integer
      *                   example: 1
      *       400:
-     *         description: Eksik parametreler
+     *         description: Missing parameters
      *       401:
-     *         description: Yetkisiz erişim
+     *         description: Unauthorized access
      *       500:
-     *         description: Sunucu hatası
+     *         description: Server error
      */
     create: async (req, res) => {
         try {
@@ -75,8 +75,8 @@ const listingController = {
      * @swagger
      * /api/v1/listings/upload:
      *   post:
-     *     summary: CSV dosyası ile toplu ilan yükler
-     *     description: İçinde birden fazla ilan verisi olan bir CSV dosyasını okuyup veritabanına tek seferde ekler.
+     *     summary: adds multiple ads with CSV file
+     *     description: It reads a CSV file containing multiple job listings and adds them to the database all at once.
      *     security:
      *       - bearerAuth: []
      *     requestBody:
@@ -89,10 +89,10 @@ const listingController = {
      *               file:
      *                 type: string
      *                 format: binary
-     *                 description: Yüklenecek CSV dosyası (.csv)
+     *                 description: CSV file which will upload (.csv)
      *     responses:
      *       201:
-     *         description: İlanlar başarıyla yüklendi
+     *         description: Listings added successfully
      *         content:
      *           application/json:
      *             schema:
@@ -103,19 +103,19 @@ const listingController = {
      *                   example: "Successful"
      *                 message:
      *                   type: string
-     *                   example: "5 ilan yuklendi."
+     *                   example: "5 listings have been uploaded."
      *       400:
-     *         description: Dosya yüklenmedi hatası
+     *         description: File not uploaded or invalid format
      *       401:
-     *         description: Yetkisiz erişim
+     *         description: Unauthorized access
      *       500:
-     *         description: Sunucu hatası
+     *         description: Server error
      */
     uploadCSV: async (req, res) => {
         const fs = require('fs');
         const csv = require('csv-parser');
         const results = [];
-        if (!req.file) return res.status(400).json({ status: "Error", message: "Dosya yuklenmedi!" });
+        if (!req.file) return res.status(400).json({ status: "Error", message: "File not uploaded!" });
 
         fs.createReadStream(req.file.path)
             .pipe(csv())
@@ -123,7 +123,7 @@ const listingController = {
             .on('end', async () => {
                 try {
                     await listingService.createManyListings(results);
-                    res.status(201).json({ status: "Successful", message: `${results.length} ilan yuklendi.` });
+                    res.status(201).json({ status: "Successful", message: `${results.length} listings have been uploaded.` });
                 } catch (err) {
                     res.status(500).json({ status: "Error", message: err.message });
                 }
@@ -134,8 +134,8 @@ const listingController = {
      * @swagger
      * /api/v1/bookings:
      *   post:
-     *     summary: Bir ev için rezervasyon yapar (Guest tarafı)
-     *     description: Misafirin bir evi kiralamasını/rezervasyon yapmasını sağlar.
+     *     summary: books a home (Guest side)
+     *     description: Allows a guest to book a stay at a listing.
      *     security:
      *       - bearerAuth: []
      *     requestBody:
@@ -156,7 +156,7 @@ const listingController = {
      *               - guest_id
      *     responses:
      *       201:
-     *         description: Rezervasyon başarılı
+     *         description: booking successful
      *         content:
      *           application/json:
      *             schema:
@@ -169,11 +169,11 @@ const listingController = {
      *                   type: integer
      *                   example: 123
      *       400:
-     *         description: Rezervasyon hatası
+     *         description: Booking error
      *       401:
-     *         description: Yetkisiz erişim
+     *         description: Unauthorized access
      *       500:
-     *         description: Sunucu hatası
+     *         description: Server error
      */
     book: async (req, res) => {
         try {
@@ -188,24 +188,24 @@ const listingController = {
      * @swagger
      * /api/v1/listings:
      *   get:
-     *     summary: İlanları arar ve listeler (Sayfalama destekli)
-     *     description: Ülke ve şehir bilgisine göre ilanları getirir. Sonuçları sayfalara bölerek sunucuyu yormaz.
+     *     summary: Searches and lists listings (Pagination supported)
+     *     description: Retrieves listings based on country and city information. Divides results into pages to avoid overloading the server.
      *     parameters:
      *       - in: query
      *         name: country
      *         schema:
      *           type: string
-     *         description: Ülke adı (Örn. Turkey)
+     *         description: Country name (like Turkey)
      *       - in: query
      *         name: city
      *         schema:
      *           type: string
-     *         description: Şehir adı (Örn. Izmir)
+     *         description: city name (e.g., Izmir)
      *       - in: query
      *         name: no_of_people
      *         schema:
      *           type: integer
-     *         description: Minimum kişi sayısı
+     *         description: Min number of people
      *       - in: query
      *         name: page
      *         schema:
@@ -217,10 +217,10 @@ const listingController = {
      *         schema:
      *           type: integer
      *           default: 10
-     *         description: Sayfa başına kaç kayıt gelsin? (Örn. 10)
+     *         description: How many records per page? (like 10)
      *     responses:
      *       200:
-     *         description: Başarılı şekilde listelendi
+     *         description: Successful
      *         content:
      *           application/json:
      *             schema:
@@ -262,9 +262,9 @@ const listingController = {
      *                         type: number
      *                         example: 1500.50
      *       400:
-     *         description: Geçersiz parametreler
+     *         description: Invalid parameters
      *       500:
-     *         description: Sunucu hatası
+     *         description: Server error
      */
     query: async (req, res) => {
         try {
@@ -279,14 +279,14 @@ const listingController = {
         } catch (error) {
             return res.status(500).json({ status: "Error", message: error.message });
         }
-    },// İŞTE BU VİRGÜL EKSİKTİ! Satır 281'in sonuna bunu koy.
+    },
 
     /**
      * @swagger
      * /api/v1/reviews:
      *   post:
-     *     summary: Kaldığı ev için yorum yapar (Guest tarafı)
-     *     description: Misafirin kaldığı ev hakkında yorum yapmasını sağlar.
+     *     summary: Reviews the place where you stayed (Guest side)
+     *     description: Allows guests to leave reviews about the place they stayed.
      *     security:
      *       - bearerAuth: []
      *     requestBody:
@@ -306,13 +306,13 @@ const listingController = {
      *                 example: 4
      *               comment:
      *                 type: string
-     *                 example: "Harika bir ev, çok temiz ve konforlu!"
+     *                 example: "Awesome stay, very clean and cozy"
      *             required:
      *               - listing_id
      *               - rating
      *     responses:
      *       201:
-     *         description: Yorum başarıyla kaydedildi
+     *         description: Review saved successfully
      *         content:
      *           application/json:
      *             schema:
@@ -323,24 +323,24 @@ const listingController = {
      *                   example: "Successful"
      *                 message:
      *                   type: string
-     *                   example: "Yorumunuz basariyla kaydedildi!"
+     *                   example: "Review saved successfully"
      *       400:
-     *         description: Geçersiz yorum verisi
+     *         description: Invalid review data
      *       401:
-     *         description: Yetkisiz erişim
+     *         description: Unauthorized access
      *       500:
-     *         description: Sunucu hatası
+     *         description: Server error
      */
     review: async (req, res) => {
-        return res.status(201).json({ status: "Successful", message: "Yorumunuz basariyla kaydedildi!" });
+        return res.status(201).json({ status: "Successful", message: "Review saved successfully" });
     },
 
     /**
      * @swagger
      * /api/v1/admin/reports:
      *   get:
-     *     summary: İlan raporlarını getirir (Admin tarafı)
-     *     description: Sistemdeki tüm ilanların performans raporlarını getirir.
+     *     summary: Fetch listing reports (Admin side)
+     *     description: Fetches performance reports for all listings in the system.
      *     security:
      *       - bearerAuth: []
      *     parameters:
@@ -349,16 +349,16 @@ const listingController = {
      *         schema:
      *           type: integer
      *           default: 1
-     *         description: Kaçıncı sayfa? (Örn. 1)
+     *         description: Which page? (e.g., 1)
      *       - in: query
      *         name: limit
      *         schema:
      *           type: integer
      *           default: 10
-     *         description: Sayfa başına kaç kayıt gelsin? (Örn. 10)
+     *         description: How many records per page? (e.g., 10)
      *     responses:
      *       200:
-     *         description: Rapor hazır
+     *         description: Report is ready
      *         content:
      *           application/json:
      *             schema:
@@ -372,18 +372,18 @@ const listingController = {
      *                   example: 1
      *                 report_data:
      *                   type: string
-     *                   example: "Tum ilanlarin performans raporu hazir."
+     *                   example: "all performance report of listings are ready"
      *       401:
-     *         description: Yetkisiz erişim
+     *         description: Unauthorized access
      *       500:
-     *         description: Sunucu hatası
+     *         description: Server error
      */
     report: async (req, res) => {
         const page = parseInt(req.query.page) || 1;
         return res.status(200).json({ 
             status: "Successful", 
             current_page: page,
-            report_data: "Tum ilanlarin performans raporu hazir." 
+            report_data: "all performance report of listings are ready" 
         });
     }
 };

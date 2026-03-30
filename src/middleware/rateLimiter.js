@@ -10,13 +10,13 @@ const searchLimiter = (req, res, next) => {
     if (currentUsage >= 3) {
         return res.status(429).json({ 
             status: "Error", 
-            message: "Günlük arama limitiniz (3) dolmuştur. Yarın tekrar deneyin." 
+            message: "Daily search limit reached. You can only search 3 per day." 
         });
     }
 
     // Limiti bir artır ve devam etmesine izin ver
     rateLimitMap.set(key, currentUsage + 1);
-    console.log(`IP: ${ip} | Bugün yapılan arama sayısı: ${currentUsage + 1}`);
+    console.log(`IP: ${ip} | Daily search count: ${currentUsage + 1}`);
     next();
 };
 
