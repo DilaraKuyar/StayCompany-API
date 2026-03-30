@@ -136,8 +136,8 @@ const listingController = {
      * @swagger
      * /api/v1/listings:
      *   get:
-     *     summary: İlanları arar
-     *     description: Ülke ve şehir bilgisine göre ilanları filtreler.
+     *     summary: İlanları arar ve listeler (Sayfalama destekli)
+     *     description: Ülke ve şehir bilgisine göre ilanları getirir. Sonuçları sayfalara bölerek sunucuyu yormaz.
      *     parameters:
      *       - in: query
      *         name: country
@@ -149,26 +149,86 @@ const listingController = {
      *         schema:
      *           type: string
      *         description: Şehir adı (Örn. Izmir)
+     *       - in: query
+     *         name: no_of_people
+     *         schema:
+     *           type: integer
+     *         description: Minimum kişi sayısı
+     *       - in: query
+     *         name: page
+     *         schema:
+     *           type: integer
+     *           default: 1
+     *         description: Kaçıncı sayfa? (Örn. 1)
+     *       - in: query
+     *         name: limit
+     *         schema:
+     *           type: integer
+     *           default: 10
+     *         description: Sayfa başına kaç kayıt gelsin? (Örn. 10)
      *     responses:
      *       200:
      *         description: Başarılı şekilde listelendi
+     *         content:
+     *           application/json:
+     *             schema:
+     *               type: object
+     *               properties:
+     *                 status:
+     *                   type: string
+     *                   example: "Successful"
+     *                 current_page:
+     *                   type: integer
+     *                   example: 1
+     *                 items_per_page:
+     *                   type: integer
+     *                   example: 10
+     *                 total_results_on_page:
+     *                   type: integer
+     *                   example: 5
+     *                 listings:
+     *                   type: array
+     *                   items:
+     *                     type: object
+     *                     properties:
+     *                       id:
+     *                         type: integer
+     *                         example: 1
+     *                       host_id:
+     *                         type: integer
+     *                         example: 1
+     *                       no_of_people:
+     *                         type: integer
+     *                         example: 4
+     *                       country:
+     *                         type: string
+     *                         example: "Turkey"
+     *                       city:
+     *                         type: string
+     *                         example: "Izmir"
+     *                       price:
+     *                         type: number
+     *                         example: 1500.50
+     *       400:
+     *         description: Geçersiz parametreler
+     *       500:
+     *         description: Sunucu hatası
      */
     query: async (req, res) => {
         try {
-            // URL'den sayfa (page) ve kaç tane getirileceğini (limit) alıyoruz. 
-            // Eğer yazmamışlarsa 1. sayfa ve 10 kayıt olarak varsayıyoruz.
+            // URL'den gelen sayfa ve limit değerlerini alıyoruz
             const page = parseInt(req.query.page) || 1;
             const limit = parseInt(req.query.limit) || 10;
-            const offset = (page - 1) * limit;
-
-            // req.query içine limit ve offset'i de ekleyip Service'e yolluyoruz
-            const searchParams = { ...req.query, limit, offset };
-
-            const results = await listingService.queryListings(searchParams);
+            
+            // Verileri servisten çekiyoruz
+            const results = await listingService.queryListings(req.query);
+            
+            // Cevabı sayfalama bilgileriyle beraber döndürüyoruz
             return res.status(200).json({ 
                 status: "Successful", 
-                page: page,
-                limit: limit,
+                current_page: page,
+                items_per_page: limit,
+                total_results_on_page: results.length,
                 listings: results 
             });
         } catch (error) {
