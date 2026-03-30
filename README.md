@@ -22,7 +22,7 @@ To evaluate the system performance under concurrent usage, I performed load test
 * **Error Rate:** 0.00%
 
 ### 3. Stress Load (100 Virtual Users)
-![Stress Load ss](image-2.png)
+![Stress Load ss](stressL.png)
 * **Average Response Time:** 5.79 ms
 * **95th Percentile (p95):** 15.78 ms
 * **Throughput:** ~99.26 requests/second

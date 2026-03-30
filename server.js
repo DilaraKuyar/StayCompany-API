@@ -5,14 +5,16 @@ const swaggerJsdoc = require('swagger-jsdoc');
 
 // 1. Controller ve Middleware Çağrıları
 const listingController = require('./src/controllers/listingController');
-const authController = require('./src/controllers/authController'); // Eksik olan çağrı eklendi!
+const authController = require('./src/controllers/authController');
 const searchLimiter = require('./src/middleware/rateLimiter');
+
+// İŞTE YENİ GÜVENLİK GÖREVLİMİZ BURADA! 👇
+const auth = require('./src/middleware/authMiddleware');
 
 // 2. Uygulamayı (App) Başlatma
 const app = express();
-app.use(express.json()); // JSON verilerini okuyabilmek için şart!
+app.use(express.json());
 
-// Multer Ayarı
 const upload = multer({ dest: 'uploads/' });
 
 // 3. Swagger (Dokümantasyon) Ayarları
@@ -22,7 +24,7 @@ const swaggerOptions = {
         info: { title: 'Stay API', version: '1.0.0', description: 'Listing & Booking API' },
         servers: [{ url: 'http://localhost:3000' }],
     },
-    apis: ['./src/controllers/*.js'], // Controller içindeki notları okuyacak
+    apis: ['./src/controllers/*.js'],
 };
 const specs = swaggerJsdoc(swaggerOptions);
 app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(specs));
@@ -30,25 +32,24 @@ app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(specs));
 
 // ------------------ ROTALAR (ROUTES) ------------------
 
-// TEST ROTASI: http://localhost:3000/
 app.get('/', (req, res) => {
     res.send("Sunucu Calisiyor!");
 });
 
-// GÜVENLİK: Login
+// GÜVENLİK: Login (Bilet alma yeri, buraya kilit konmaz)
 app.post('/api/v1/login', authController.login);
 
-// HOST: Ev Ekleme (Manuel)
-app.post('/api/v1/listings', listingController.create);
+// HOST: Ev Ekleme (Manuel) -> KİLİT EKLENDİ (auth)
+app.post('/api/v1/listings', auth, listingController.create);
 
-// HOST: Ev Ekleme (CSV ile)
-app.post('/api/v1/listings/upload', upload.single('file'), listingController.uploadCSV);
+// HOST: Ev Ekleme (CSV ile) -> KİLİT EKLENDİ (auth)
+app.post('/api/v1/listings/upload', auth, upload.single('file'), listingController.uploadCSV);
 
-// GUEST: Ev Arama (Sayfalama + Rate Limiter)
+// GUEST: Ev Arama (Sayfalama + Rate Limiter) -> KİLİT YOK (Tabloya göre NO)
 app.get('/api/v1/listings', searchLimiter, listingController.query);
 
-// GUEST: Rezervasyon Yapma
-app.post('/api/v1/bookings', listingController.book);
+// GUEST: Rezervasyon Yapma -> KİLİT EKLENDİ (auth)
+app.post('/api/v1/bookings', auth, listingController.book);
 
 
 // ------------------ SUNUCUYU AYAĞA KALDIR ------------------

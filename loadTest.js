@@ -7,7 +7,7 @@ export const options = {
 };
 
 export default function () {
-  const res = http.get('http://localhost:3000/api/v1/listings?country=Turkey&city=Izmir&no_of_people=2');
+  const res = http.get('http://44.200.13.208:3000');
   
   // Hocanın istediği "Hata Oranını (Error Rate)" ölçmek için:
   check(res, {

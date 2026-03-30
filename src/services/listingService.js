@@ -1,63 +1,32 @@
 const db = require('../config/db');
 
 class ListingService {
-    // Veritabanına yeni ilan ekleyen asıl fonksiyon
+    // 1. Yeni İlan Ekleme
     async createListing(listingData) {
         const { host_id, no_of_people, country, city, price } = listingData;
-        
-        const query = `INSERT INTO Listings (host_id, no_of_people, country, city, price) 
-                       VALUES (?, ?, ?, ?, ?)`;
-        
-        // db.js'den gelen pool (bağlantı havuzu) üzerinden sorguyu çalıştırıyoruz
+        const query = `INSERT INTO Listings (host_id, no_of_people, country, city, price) VALUES (?, ?, ?, ?, ?)`;
         const [result] = await db.execute(query, [host_id, no_of_people, country, city, price]);
         return result;
     }
 
-    // İleride "Query Listings" (Arama) için burayı kullanacağız
+    // 2. Tüm İlanları Getirme
     async getAllListings() {
         const [rows] = await db.execute('SELECT * FROM Listings');
         return rows;
     }
-        // Arama fonksiyonu (Misafirler için)
-async queryListings(params) {
-    const { from, to, no_of_people, country, city, page = 1, limit = 10 } = params;
-    const offset = (page - 1) * limit;
 
-    // Görseldeki kural: Rezervasyonu olan evleri getirme
-    // SQL'de "NOT EXISTS" kullanarak o tarihlerde çakışan rezervasyonu olmayanları seçiyoruz
-    const query = `
-        SELECT l.* FROM Listings l
-        WHERE l.no_of_people >= ? 
-        AND l.country = ? 
-        AND l.city = ?
-        AND NOT EXISTS (
-            SELECT 1 FROM Bookings b 
-            WHERE b.listing_id = l.id 
-            AND (
-                (b.from_date <= ? AND b.to_date >= ?) OR
-                (b.from_date <= ? AND b.to_date >= ?)
-            )
-        )
-        LIMIT ? OFFSET ?`;
-
-    const [rows] = await db.execute(query, [
-        no_of_people, country, city, 
-        to, from, from, to, 
-        parseInt(limit), parseInt(offset)
-    ]);
-    return rows;
-}
-async createManyListings(listingsArray) {
+    // 3. Toplu İlan Yükleme (CSV)
+    async createManyListings(listingsArray) {
         const query = 'INSERT INTO Listings (host_id, no_of_people, country, city, price) VALUES ?';
-        // Bulk insert (toplu ekleme) için veriyi uygun formata getiriyoruz
         const values = listingsArray.map(l => [l.host_id, l.no_of_people, l.country, l.city, l.price]);
         const [result] = await db.query(query, [values]);
         return result;
     }
+
+    // 4. Rezervasyon Yapma (Çakışma Kontrollü)
     async bookAStay(bookingData) {
         const { listing_id, guest_id, from_date, to_date } = bookingData;
 
-        // ÇAKIŞMA KONTROLÜ: Aynı tarihlerde başka bir rezervasyon var mı?
         const checkQuery = `
             SELECT * FROM Bookings 
             WHERE listing_id = ? 
@@ -76,21 +45,29 @@ async createManyListings(listingsArray) {
         const [result] = await db.execute(insertQuery, [listing_id, guest_id, from_date, to_date]);
         return result;
     }
+
+    // 5. İlanları Arama ve SAYFALAMA (PAGING) - Temizlenmiş ve Birleştirilmiş Hal
     async queryListings(params) {
-        const { country, city, no_of_people, page = 1, limit = 10 } = params;
+        // Parametreleri al, eğer gönderilmemişse varsayılan değerleri (1. sayfa, 10 kayıt) kullan
+        const { country, city, no_of_people = 1, page = 1, limit = 10 } = params;
         
-        // Kaçıncı kayıttan başlayacağını hesapla (Örn: 2. sayfa için 10 kayıt atla)
-        const offset = (page - 1) * limit;
+        const limitNumber = parseInt(limit);
+        const offsetNumber = (parseInt(page) - 1) * limitNumber;
 
         const query = `
             SELECT * FROM Listings 
             WHERE country = ? AND city = ? AND no_of_people >= ?
             LIMIT ? OFFSET ?`;
             
-        const [rows] = await db.execute(query, [country, city, no_of_people, String(limit), String(offset)]);
+        const [rows] = await db.execute(query, [
+            country, 
+            city, 
+            parseInt(no_of_people), 
+            limitNumber, 
+            offsetNumber
+        ]);
         return rows;
     }
 }
-
 
 module.exports = new ListingService();

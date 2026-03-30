@@ -155,8 +155,22 @@ const listingController = {
      */
     query: async (req, res) => {
         try {
-            const results = await listingService.queryListings(req.query);
-            return res.status(200).json({ status: "Successful", listings: results });
+            // URL'den sayfa (page) ve kaç tane getirileceğini (limit) alıyoruz. 
+            // Eğer yazmamışlarsa 1. sayfa ve 10 kayıt olarak varsayıyoruz.
+            const page = parseInt(req.query.page) || 1;
+            const limit = parseInt(req.query.limit) || 10;
+            const offset = (page - 1) * limit;
+
+            // req.query içine limit ve offset'i de ekleyip Service'e yolluyoruz
+            const searchParams = { ...req.query, limit, offset };
+
+            const results = await listingService.queryListings(searchParams);
+            return res.status(200).json({ 
+                status: "Successful", 
+                page: page,
+                limit: limit,
+                listings: results 
+            });
         } catch (error) {
             return res.status(500).json({ status: "Error", message: error.message });
         }
