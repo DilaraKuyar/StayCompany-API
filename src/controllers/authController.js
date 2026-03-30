@@ -3,7 +3,7 @@ const jwt = require('jsonwebtoken');
 const authController = {
     /**
      * @swagger
-     * /api/v1/auth/login:
+     * /api/v1/login:
      *   post:
      *     summary: Sisteme giriş yapar ve Token (Bilet) alır
      *     description: Kullanıcının email ve şifresi ile sisteme giriş yapmasını sağlar ve JWT token döner.

@@ -23,6 +23,15 @@ const swaggerOptions = {
         openapi: '3.0.0',
         info: { title: 'Stay API', version: '1.0.0', description: 'Listing & Booking API' },
         servers: [{ url: 'http://localhost:3000' }],
+        components: {
+            securitySchemes: {
+                bearerAuth: {
+                    type: 'http',
+                    scheme: 'bearer',
+                    bearerFormat: 'JWT',
+                },
+            },
+        },
     },
     apis: ['./src/controllers/*.js'],
 };
@@ -50,6 +59,8 @@ app.get('/api/v1/listings', searchLimiter, listingController.query);
 
 // GUEST: Rezervasyon Yapma -> KİLİT EKLENDİ (auth)
 app.post('/api/v1/bookings', auth, listingController.book);
+app.post('/api/v1/reviews', auth, listingController.review);
+app.get('/api/v1/admin/reports', auth, listingController.report);
 
 
 // ------------------ SUNUCUYU AYAĞA KALDIR ------------------
