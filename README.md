@@ -89,8 +89,9 @@ npm install
 ### Development Mode
 npm run dev
 
-###Production Mode
+### Production Mode
 npm start
+
 **Server will run on**
 http://localhost:3000 
 
@@ -117,9 +118,32 @@ src/config/db.js
 - The API is deployed on an AWS EC2 instance. 
 
 ### 1.Server Setup
--sudo apt update
--sudo apt install nodejs npm -y
 
--git clone https://github.com/DilaraKuyar/StayCompany-API.git
--cd StayCompany-API
--npm install
+```bash
+sudo apt update
+sudo apt install nodejs npm -y
+
+git clone https://github.com/DilaraKuyar/StayCompany-API.git
+cd StayCompany-API
+npm instal
+```
+
+### 2.Process Management(PM2)
+```bash
+sudo npm install -g pm2
+
+pm2 start server.js --name "StayAPI"
+pm2 save
+pm2 startup
+```
+
+### Networking § Security
+- Port 3000 is open via AWS Security Groups
+- Rate limiting implemented to prevent brute-force attacks
+
+- API Docs:
+```bash
+http://44.200.13.208:3000/api-docs
+```
+
+
