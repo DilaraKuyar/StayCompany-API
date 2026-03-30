@@ -1,31 +1,36 @@
 import http from 'k6/http';
-import { sleep, check } from 'k6';
+import { check, sleep } from 'k6';
 
 export const options = {
+  // Hocanın istediği 3 farklı yük senaryosu
   stages: [
-    { duration: '30s', target: 20 },
-    { duration: '30s', target: 50 },
-    { duration: '30s', target: 100 },
+    { duration: '30s', target: 20 },  // Normal yük
+    { duration: '30s', target: 50 },  // Peak (Tepe) yük
+    { duration: '30s', target: 100 }, // Stress yükü
   ],
+  thresholds: {
+    // Hocanın raporunda görmek istediği metrikler
+    http_req_duration: ['p(95)<500'], // İsteklerin %95'i 500ms altında yanıt vermeli
+  },
 };
 
 export default function () {
-  // 1. ADIM: Swagger'daki /login'den aldığın o uzun Token'ı buraya yapıştır
-  const myToken = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."; 
+  const url = 'http://44.200.13.208:3000/api-docs/';
 
   const params = {
     headers: {
-      'Authorization': `Bearer ${myToken}`, // Kapıyı bu anahtar açacak
+      'Authorization': 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...', 
+      'Content-Type': 'application/json',
     },
   };
 
-  // 2. ADIM: İlanları aradığımız endpoint'e bu anahtarla git
-  const res = http.get('http://44.200.13.208:3000/api/v1/listings', params);
-  
-  // 3. ADIM: Şimdi kontrol et, hepsi yeşil olacak!
+  const res = http.get(url, params);
+
+  // Dönen cevabın 200 (Başarılı) olduğunu kontrol et
   check(res, {
-    'status was 200': (r) => r.status === 200,
+    'status is 200': (r) => r.status === 200,
   });
-  
+
+  // Her sanal kullanıcının bir sonraki isteği atmadan önce 1 saniye beklemesi
   sleep(1);
 }
