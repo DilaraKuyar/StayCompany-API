@@ -74,6 +74,7 @@ Check your environment:
 ```bash
 node -v
 npm -v
+```
 
 ## 1.Clone the Repository
 
@@ -92,3 +93,24 @@ npm run dev
 npm start
 **Server will run on**
 http://localhost:3000 
+
+## API Endpoints(V1)
+
+| Method | Route                   | Description                                 | Auth |
+| ------ | ----------------------- | ------------------------------------------- | ---- |
+| POST   | /api/v1/login           | Login and get JWT Token (Ticket)            | ❌    |
+| GET    | /api/v1/listings        | Search & list properties (paging supported) | ❌    |
+| POST   | /api/v1/listings        | Add a new listing (host side)               | ✅    |
+| POST   | /api/v1/listings/upload | Bulk upload listings via CSV                | ✅    |
+| POST   | /api/v1/bookings        | Book a stay (guest side)                    | ✅    |
+| POST   | /api/v1/reviews         | Post a review                               | ✅    |
+| GET    | /api/v1/admin/reports   | Get performance reports (paging supported)  | ✅    |
+
+
+## Database
+Database: MySQL
+Persistent storage ensures data integrity
+Configure credentials in: 
+src/config/db.js
+
+## Deployment(AWS EC2)
