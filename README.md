@@ -35,13 +35,13 @@ The system architecture follows a relational model to ensure data integrity and 
 The API performance was validated using **k6** across three automated load stages (Normal, Peak, and Stress) deployed on an **AWS EC2** instance.
 
 ### Performance Metrics
-
+![Load Test](loadTest.png)
 | Scenario | Virtual Users (VUs) | Avg Response Time | p95 Latency | Req/Sec | Error Rate |
 | :--- | :--- | :--- | :--- | :--- | :--- |
 | **Normal Load** | 20 | 141.47ms | 185.20ms | ~150 | 0% |
 | **Peak Load** | 50 | 178.10ms | 224.50ms | ~320 | 0% |
 | **Stress Load** | 100 | **224.96ms** | **284.86ms** | **32.29** | **0%** |
-![Load Test](loadTest.png)
+
 ### Key Findings
 
 * **Stability:** Maintained a **100% success rate** (2,947 total requests) with zero failures under high concurrency (100 VUs).
