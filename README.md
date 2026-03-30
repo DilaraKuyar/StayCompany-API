@@ -6,7 +6,7 @@ A robust, service-oriented RESTful API built with **Node.js**, **Express**, and 
 
 ## 🚀 Project Links
 - **Deployed Swagger URL:** [http://44.200.13.208:3000/api-docs](http://44.200.13.208:3000/api-docs)
-- **Presentation Video:** [...]
+- **Presentation Video:** [https://youtu.be/KSFWiSaYdxk]
 
 ---
 
